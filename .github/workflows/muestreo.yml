@@ -31,5 +31,5 @@ jobs:
               done
             fi
             ahora=$(date +%s)
-            sleep $(( 600 - ahora % 600 ))
+            sleep $(( 300 - ahora % 300 ))
           done
