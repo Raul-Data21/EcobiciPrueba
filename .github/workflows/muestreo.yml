@@ -1,10 +1,11 @@
 name: muestreo-largo
 on:
   schedule:
-    - cron: "7 * * * *"   # intenta arrancar cada hora; si ya hay una corriendo, espera su turno
-  workflow_dispatch: {}    # boton "Run workflow" para arrancarlo a mano
+    - cron: "7 * * * *"   # respaldo: intenta arrancar cada hora
+  workflow_dispatch: {}    # boton "Run workflow" (y la forma en que cada turno llama al siguiente)
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: muestreo
   cancel-in-progress: false
@@ -16,7 +17,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-      - name: una foto cada 10 min durante 5.5 horas
+      - name: formar al siguiente turno en la fila
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run muestreo.yml --ref main --repo "$GITHUB_REPOSITORY"
+      - name: una foto cada 5 min durante 5.5 horas
         run: |
           git config user.name "muestreador"
           git config user.email "muestreador@users.noreply.github.com"
